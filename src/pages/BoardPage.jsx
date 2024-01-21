@@ -26,7 +26,7 @@ export default function BoardPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [userId, setUserId] = useState(-1);
-  const [role, setRole] = useState('BASE');
+  const [role, setRole] = useState('USER');
 
   const entriesPerPage = 12;
   const [pages, setPages] = useState(0);
@@ -164,10 +164,19 @@ export default function BoardPage() {
     }
   };
 
-  // Placeholder for My Board click event handler
-  // const handleMyBoardClick = () => {
-  //   fetchBoardlists(userId, currentPage, entriesPerPage);  // Load user-specific boards
-  // };
+  const handleMyBoardsClick = () => {
+    if (role === 'BASE') {
+      // 对于 'base' 用户的操作
+      notifications.show({
+        title: 'Access Denied',
+        color: 'red',
+        message: 'Please register/login first.',
+      });
+    } else if (role === 'USER') {
+      fetchBoardlists(currentPage, entriesPerPage, userId); 
+      setCurrentBoards('my'); 
+    } 
+  };
 
 
 
@@ -186,7 +195,7 @@ export default function BoardPage() {
           </button>
           {/* my boards */}
           <button
-            onClick={() => { fetchBoardlists(currentPage, entriesPerPage,userId); setCurrentBoards('my'); }}
+            onClick={handleMyBoardsClick}
             className={`px-4 py-2 text-sm font-bold ${currentBoards === 'my' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black hover:bg-gray-300'} rounded-r-full`}
           >
             My Boards
@@ -204,8 +213,8 @@ export default function BoardPage() {
               boardData={boardData}
               // onModify={modifyBoard} 
               // onDelete={deleteBoard}
-              onModify={(currentBoards === 'my' && boardData.creator.user_id === userId)||(role ==='ADMIN') ? modifyBoard : null}
-              onDelete={(currentBoards === 'my' && boardData.creator.user_id === userId)||(role ==='ADMIN') ? deleteBoard : null}
+              onModify={(currentBoards === 'my' && boardData.creator.user_id == userId)||(role ==='ADMIN') ? modifyBoard : null}
+              onDelete={(currentBoards === 'my' && boardData.creator.user_id == userId)||(role ==='ADMIN') ? deleteBoard : null}
             />
         ))}
         </div>
@@ -213,6 +222,7 @@ export default function BoardPage() {
 
         
       {/* add board */}
+      { (role === 'USER' || role === 'ADMIN') && (
       <button
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -223,6 +233,7 @@ export default function BoardPage() {
       >
       {hover ? 'Add Board' : <IoIosAddCircle className="text-2xl" />}
       </button>
+      )}
       <div className="flex flex-row flex-wrap justify-center">
       <Modal 
         className="p-4"
@@ -270,7 +281,7 @@ export default function BoardPage() {
 
 
       {/* 翻页 */}
-      <Pagination.Root total={pages} onChange={(page) => fetchBoardlists(userId, currentPage, entriesPerPage)}>
+      <Pagination.Root total={pages} onChange={(page) => fetchBoardlists(currentPage, entriesPerPage,userId)}>
         <Group gap={5} justify="center">
           <Pagination.First />
           <Pagination.Previous />

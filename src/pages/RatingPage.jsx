@@ -18,36 +18,36 @@ function RatingPage() {
   const [newRatingDescription, setNewRatingDescription] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
-  const [boardData, setBoardData] = useState(null);
+  // const [boardData, setBoardData] = useState(null);
 
 
   
-  const fetchBoard = async (boardId) => {
-    const data = await userApi.getBoard(boardId);
-    if (data.code === 'SUCCESS') {
-      setBoardData(data.data);
-      fetchRatings(data.data.board_id, page, perPage);
-    } else if (data.code === 'INVALID') {
-      console.error(data.code);
-      notifications.show({
-        title: 'Board',
-        color: 'red',
-        message: 'Invalid operation or other error. Please try again.',
-      });
-    } else if (data.code === 'NOT_EXIST') {
-      console.error(data.code);
-      notifications.show({
-        title: 'Board',
-        color: 'red',
-        message: 'User does not exist.',
-      });
-    }
-  };
+  // const fetchBoard = async (boardId) => {
+  //   const data = await userApi.getBoard(boardId);
+  //   if (data.code === 'SUCCESS') {
+  //     setBoardData(data.data);
+  //     fetchRatings(data.data.board_id, page, perPage);
+  //   } else if (data.code === 'INVALID') {
+  //     console.error(data.code);
+  //     notifications.show({
+  //       title: 'Board',
+  //       color: 'red',
+  //       message: 'Invalid operation or other error. Please try again.',
+  //     });
+  //   } else if (data.code === 'NOT_EXIST') {
+  //     console.error(data.code);
+  //     notifications.show({
+  //       title: 'Board',
+  //       color: 'red',
+  //       message: 'User does not exist.',
+  //     });
+  //   }
+  // };
 
 
-  useEffect(() => {
-    fetchBoard(board_id);
-  }, [board_id]);
+  // useEffect(() => {
+  //   fetchBoard(board_id);
+  // }, [board_id]);
 
 
 
@@ -58,19 +58,19 @@ function RatingPage() {
   };
 
 // test data
-  // const boardData = {
-  //   board_id: 123,
-  //   title: 'Board Title',
-  //   description: 'Board Description blablablalbalbalblablablalba Pkmpyzsswx qmrmobvsl sqpetsey rxnluilrr oqupvwjrrs mtywuwno lituuivc asbggxecq urhywnykne uvhg djxpih ujxq ipv jotvjic rhffn ponfqoxlh gfzy ndmu.',
-  //   overall_score: 4.5,
-  //   total_count: 1580,
-  //   scores: [30, 50, 100, 400, 1000],
-  //   creator: {
-  //     user_name: 'User Name',
-  //   },
-  // };
+  const boardData = {
+    board_id: 123,
+    title: 'Board Title',
+    description: 'Board Description blablablalbalbalblablablalba Pkmpyzsswx qmrmobvsl sqpetsey rxnluilrr oqupvwjrrs mtywuwno lituuivc asbggxecq urhywnykne uvhg djxpih ujxq ipv jotvjic rhffn ponfqoxlh gfzy ndmu.',
+    overall_score: 4.5,
+    total_count: 1580,
+    scores: [30, 50, 100, 400, 1000],
+    creator: {
+      user_name: 'User Name',
+    },
+  };
   
-  // useEffect(() => {fetchRatings(boardData.board_id, page, perPage)}, []);
+  useEffect(() => {fetchRatings(boardData.board_id, page, perPage)}, []);
 
 
   async function createRating(score, description) {

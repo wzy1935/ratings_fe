@@ -3,7 +3,7 @@ import { FaGithubSquare } from "react-icons/fa";
 
 export default function FooterSocial() {
   return (
-    <div className="mt-30 border-t border-gray-200">
+    <div className="mt- border-t border-gray-200">
       <Container className="flex justify-between items-center pt-10 pb-10">
         {/* <MantineLogo size={28} /> */}
         <Group gap={0} className="flex items-center justify-end" justify="flex-end" wrap="nowrap">

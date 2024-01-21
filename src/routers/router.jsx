@@ -5,7 +5,6 @@ import AuthPage from '../pages/AuthPage.jsx';
 import UserPage from '../pages/UserPage.jsx';
 import BoardPage from '../pages/BoardPage.jsx';
 import RatingPage from '../pages/RatingPage.jsx';
-
 const router = createBrowserRouter([
   {
     path: '/',
