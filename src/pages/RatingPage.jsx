@@ -5,9 +5,12 @@ import { Card, Image, Text, Badge, Title, Button, Group, Rating, Stack, Modal, T
 import { IoIosAddCircle } from "react-icons/io";
 import { notifications } from '@mantine/notifications';
 import ProgressBar from '../components/ProgressBar';
+import { useParams } from 'react-router-dom';
+
 
 function RatingPage() {
 
+  const { board_id } = useParams();
   const [ratings, setRatings] = useState([]);
   const [hover, setHover] = useState('');
   const [addingRating, setAddingRating] = useState(false);
@@ -15,18 +18,38 @@ function RatingPage() {
   const [newRatingDescription, setNewRatingDescription] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [boardData, setBoardData] = useState(null);
 
-  const boardData = {
-    board_id: 123,
-    title: 'Board Title',
-    description: 'Board Description blablablalbalbalblablablalba Pkmpyzsswx qmrmobvsl sqpetsey rxnluilrr oqupvwjrrs mtywuwno lituuivc asbggxecq urhywnykne uvhg djxpih ujxq ipv jotvjic rhffn ponfqoxlh gfzy ndmu.',
-    overall_score: 4.5,
-    ratings_count: 1580,
-    scores: [30, 50, 100, 400, 1000],
-    creator: {
-      user_name: 'User Name',
-    },
+
+  
+  const fetchBoard = async (boardId) => {
+    const data = await userApi.getBoard(boardId);
+    if (data.code === 'SUCCESS') {
+      setBoardData(data.data);
+      fetchRatings(data.data.board_id, page, perPage);
+    } else if (data.code === 'INVALID') {
+      console.error(data.code);
+      notifications.show({
+        title: 'Board',
+        color: 'red',
+        message: 'Invalid operation or other error. Please try again.',
+      });
+    } else if (data.code === 'NOT_EXIST') {
+      console.error(data.code);
+      notifications.show({
+        title: 'Board',
+        color: 'red',
+        message: 'User does not exist.',
+      });
+    }
   };
+
+
+  useEffect(() => {
+    fetchBoard(board_id);
+  }, [board_id]);
+
+
 
   let fetchRatings = async (board_id = boardData.board_id, page = 1, per_page = 10  ) => {
     const ratings = await userApi.getRatings( board_id, page, per_page);
@@ -34,7 +57,21 @@ function RatingPage() {
       setRatings(ratings.data);
   };
 
-  useEffect(() => {fetchRatings(boardData.board_id, page, perPage)}, []);
+// test data
+  // const boardData = {
+  //   board_id: 123,
+  //   title: 'Board Title',
+  //   description: 'Board Description blablablalbalbalblablablalba Pkmpyzsswx qmrmobvsl sqpetsey rxnluilrr oqupvwjrrs mtywuwno lituuivc asbggxecq urhywnykne uvhg djxpih ujxq ipv jotvjic rhffn ponfqoxlh gfzy ndmu.',
+  //   overall_score: 4.5,
+  //   total_count: 1580,
+  //   scores: [30, 50, 100, 400, 1000],
+  //   creator: {
+  //     user_name: 'User Name',
+  //   },
+  // };
+  
+  // useEffect(() => {fetchRatings(boardData.board_id, page, perPage)}, []);
+
 
   async function createRating(score, description) {
     console.log(score, description);
@@ -58,6 +95,8 @@ function RatingPage() {
     fetchRatings()
     setAddingRating(false);
   }
+
+
 
   return (
   <div className='xl:mx-64 md:mx-32 sm:mx-16'>
@@ -96,8 +135,8 @@ function RatingPage() {
         
       </div>
     </div>
-    {ratings.map((rating) => {
-        return <RatingCard ratingData={rating} />
+    {ratings.map((ratingData) => {
+        return <RatingCard key={ratingData.rating_id} ratingData={ratingData} />
     })}
 
     {/* add rating */}
@@ -164,7 +203,7 @@ function RatingPage() {
       onChange={(value) => {
         fetchRatings(boardData.board_id, value)
         setPage(value)}} 
-      total={boardData.ratings_count/perPage}/>
+      total={boardData.total_count/perPage}/>
     </div>
   </div>
   );

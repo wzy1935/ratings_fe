@@ -27,7 +27,7 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
         <div className="px-8 mb-10 w-full sm:w-1/2 md:w-1/3 lg:w-1/3 xl:w-1/3">
           
           <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Link to={`/rating`}>
+            <Link to={`/rating/${boardData.board_id}`}>
               <Title order={3} className="line-clamp-1" >{boardData.title}</Title>
             </Link>
             <Text size="sm" c="dimmed" className="line-clamp-3 min-h-15">

@@ -1,5 +1,20 @@
 import Mock from 'mockjs';
 
+
+// Mock the GET request to '/api/user/user-info'
+Mock.mock(/\/api\/user\/user-info/, 'get', {  // You can add logic here to return different responses based on the options, if needed
+
+  // Returning a success response
+  return: {
+      code: 'SUCCESS',
+      data: {
+          role: 'ADMIN', // or 'USER', 'BASE' based on your requirements
+          user_name: 'John Doe',
+          user_id: 1
+      }
+  },
+});
+
 // /api/board/get-page
 Mock.mock(/\/api\/board\/get-page/, 'get', (options) => {
   // 解析URL参数
@@ -57,20 +72,24 @@ Mock.mock(/\/api\/board\/get-page/, 'get', (options) => {
 });
 
 // api/board/get
-Mock.mock(/\/api\/board\/get/, 'get', {
+Mock.mock(/\/api\/board\/get/, 'get', (options) => {
+  const params = new URLSearchParams(options.url.split('?')[1]);
+  const board_id = params.get('board_id');
+  return {
     code: 'SUCCESS',
     data: {
-      board_id: '@increment',
+      board_id: board_id,
       title: '@title',
       description: '@sentence',
       overall_score: '@float(1, 5, 1, 2)',
-      scores: '@range(5)',
+      scores: Array.from({length: 5}, () => Mock.mock('@integer(0, 10000)')),
       creator: {
         user_id: '@increment',
         user_name: '@name'
       }
     }
-  });
+  };
+});
   
 //   /api/board/create
 Mock.mock(/\/api\/board\/create/, 'post', {

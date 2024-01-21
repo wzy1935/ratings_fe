@@ -24,7 +24,7 @@ const router = createBrowserRouter([
         element: <BoardPage />
       },
       {
-        path: '/rating',
+        path: '/rating/:board_id',
         element: <RatingPage />
       }
     ],

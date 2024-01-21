@@ -1,11 +1,8 @@
 import React ,{ useState, useEffect } from 'react';
 import userApi from '../apis/userApi';
 import { notifications } from '@mantine/notifications';
-import { useHover } from '@mantine/hooks';
 import { IoIosAddCircle } from "react-icons/io";
 import Board from '../components/BoardCard';
-import { Link } from 'react-router-dom';
-
 import {
   Card,
   Title,
@@ -27,18 +24,45 @@ export default function BoardPage() {
   const [hover, setHover] = useState(false);
   const [currentBoards, setCurrentBoards] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+
   const [userId, setUserId] = useState(-1);
+  const [role, setRole] = useState('BASE');
+
   const entriesPerPage = 12;
   const [pages, setPages] = useState(0);
 
 
+  // useEffect(() => {
+  //   fetchBoardlists(userId, currentPage, entriesPerPage);
+  // }, [userId,currentPage]);
   useEffect(() => {
-    fetchBoardlists(userId, currentPage, entriesPerPage);
-  }, [userId,currentPage]);
+    fetchUserId();
+    fetchBoardlists();
+  }, []);
+
+  // 没有登陆的用户有没有userId
+  const fetchUserId = async () => {
+    const data = await userApi.userInfo();
+    console.log(data);
+    if (data.code === 'SUCCESS') {
+      setUserId(data.data.user_id);
+      setRole(data.data.role);
+      fetchBoardlists(data.data.user_id);
+      console.log(data.data.user_id);
+    } else if (data.code === 'INVALID') {
+      console.error(data.code);
+      notifications.show({
+        title: 'Board',
+        color: 'red',
+        message: 'Invalid operation or other error. Please try again.',
+      });
+    } 
+  };
 
   // fetch boards (all/only my boards)
-  const fetchBoardlists = async (user_id = -1, page = 1, per_page = entriesPerPage) => {
+  const fetchBoardlists = async (page = 1, per_page = entriesPerPage, user_id = -1) => {
     const data = await userApi.getBoards(page, per_page, user_id);
+    console.log(data);
     if (data.code === 'SUCCESS') {
       setBoards(data.data.list);
       setPages(Math.ceil(data.data.total_cnt / per_page));
@@ -140,6 +164,12 @@ export default function BoardPage() {
     }
   };
 
+  // Placeholder for My Board click event handler
+  // const handleMyBoardClick = () => {
+  //   fetchBoardlists(userId, currentPage, entriesPerPage);  // Load user-specific boards
+  // };
+
+
 
   return (
     <div className="flex flex-col w-full items-center p-4">
@@ -147,14 +177,16 @@ export default function BoardPage() {
       {/* board list */}
       <div className="absolute top-12 left-4 mt-4 ml-4">
         <div className="flex">
+          {/* all boards */}
           <button
-            onClick={() => { fetchBoardlists(userId, currentPage, entriesPerPage); setCurrentBoards('all'); }}
+            onClick={() => { fetchBoardlists(currentPage, entriesPerPage,-1); setCurrentBoards('all'); }}
             className={`px-4 py-2 text-sm font-bold ${currentBoards === 'all' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black hover:bg-gray-300'} rounded-l-full`}
           >
             All Boards
           </button>
+          {/* my boards */}
           <button
-            onClick={() => { fetchBoardlists(userId, currentPage, entriesPerPage); setCurrentBoards('my'); }}
+            onClick={() => { fetchBoardlists(currentPage, entriesPerPage,userId); setCurrentBoards('my'); }}
             className={`px-4 py-2 text-sm font-bold ${currentBoards === 'my' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black hover:bg-gray-300'} rounded-r-full`}
           >
             My Boards
@@ -170,10 +202,10 @@ export default function BoardPage() {
             <Board  
               key={boardData.board_id} 
               boardData={boardData}
-              onModify={modifyBoard} 
-              onDelete={deleteBoard}
-              // onModify={currentBoards === 'my' && boardData.creator_id === userId ? modifyBoard : null}
-              // onDelete={currentBoards === 'my' && boardData.creator_id === userId ? deleteBoard : null}
+              // onModify={modifyBoard} 
+              // onDelete={deleteBoard}
+              onModify={(currentBoards === 'my' && boardData.creator.user_id === userId)||(role ==='ADMIN') ? modifyBoard : null}
+              onDelete={(currentBoards === 'my' && boardData.creator.user_id === userId)||(role ==='ADMIN') ? deleteBoard : null}
             />
         ))}
         </div>

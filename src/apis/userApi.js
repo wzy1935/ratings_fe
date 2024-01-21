@@ -23,7 +23,7 @@ export default {
   },
 
   async userInfo() {
-    return await http.get('/api/user/user-info', { params: {} });
+    return await http.get('/api/user/user-info');
   },
 
   // Board
