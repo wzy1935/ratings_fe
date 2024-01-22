@@ -26,7 +26,7 @@ export default function BoardPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [userId, setUserId] = useState(-1);
-  const [role, setRole] = useState('ADMIN');
+  const [role, setRole] = useState('BASE');
 
   const entriesPerPage = 12;
   const [pages, setPages] = useState(0);
@@ -47,7 +47,7 @@ export default function BoardPage() {
     if (data.code === 'SUCCESS') {
       setUserId(data.data.user_id);
       setRole(data.data.role);
-      fetchBoardlists(data.data.user_id);
+      fetchBoardlists(1, entriesPerPage, data.data.user_id);
       console.log(data.data.user_id);
     } else if (data.code === 'INVALID') {
       console.error(data.code);
@@ -245,6 +245,7 @@ export default function BoardPage() {
         onSubmit={(e) => {
           e.preventDefault();
           createBoard(newBoardTitle, newBoardDescription);
+          setAddingBoard(false);
         }}>
         
           <Textarea className="w-full p-2"
@@ -281,7 +282,10 @@ export default function BoardPage() {
 
 
       {/* 翻页 */}
-      <Pagination.Root total={pages} onChange={(page) => fetchBoardlists(currentPage, entriesPerPage,userId)}>
+      <Pagination.Root total={pages} onChange={(page) => {
+        setCurrentPage(page);
+        fetchBoardlists(currentPage, entriesPerPage, userId);
+      }}> 
         <Group gap={5} justify="center">
           <Pagination.First />
           <Pagination.Previous />
