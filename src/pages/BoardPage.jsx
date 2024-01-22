@@ -47,7 +47,6 @@ export default function BoardPage() {
     if (data.code === 'SUCCESS') {
       setUserId(data.data.user_id);
       setRole(data.data.role);
-      fetchBoardlists(data.data.user_id);
       console.log(data.data.user_id);
     } else if (data.code === 'INVALID') {
       console.error(data.code);
