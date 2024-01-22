@@ -42,7 +42,7 @@ export default function BoardPage() {
 
   // 没有登陆的用户有没有userId
   const fetchUserId = async () => {
-    const data = await userApi.userInfo();
+    const data = await userApi.getUserInfo();
     console.log(data);
     if (data.code === 'SUCCESS') {
       setUserId(data.data.user_id);

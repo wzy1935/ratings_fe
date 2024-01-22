@@ -22,7 +22,7 @@ export default {
     });
   },
 
-  async userInfo() {
+  async getUserInfo() {
     return await http.get('/api/user/user-info');
   },
 
@@ -72,6 +72,25 @@ export default {
       board_id,
       score,
       comment
+    });
+  },
+  async getUserRating(board_id, user_id) {
+    return await http.get('/api/rating/get-user-rating', {
+      params: { board_id }
+    });
+  },
+
+  async modifyRating(rating_id, score, description) {
+    return await http.post('/api/rating/modify', {
+      rating_id,
+      score,
+      description
+    });
+  },
+
+  async deleteRating(rating_id) {
+    return await http.post('/api/rating/delete', {
+      rating_id
     });
   },
 };
