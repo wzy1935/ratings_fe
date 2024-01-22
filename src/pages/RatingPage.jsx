@@ -67,7 +67,7 @@ function RatingPage() {
   const fetchRatings = async (board_id = boardData.board_id, page = 1, per_page = 10  ) => {
     const ratings = await userApi.getRatings( board_id, page, per_page);
       // console.log(ratings);
-      setRatings(ratings.data);
+      setRatings(ratings.data.list);
   };
 
   const fetchUserInfo = async () => { 
@@ -178,29 +178,29 @@ function RatingPage() {
       </div>
       <div className='w-[120px] m-auto p-2'>
         <Title>{boardData.overall_score}</Title>
-        <Text>{boardData.total_count + ' ratings'}</Text>
+        <Text>{boardData.score_cnt + ' ratings'}</Text>
         <Rating value={boardData.overall_score} fractions={2} readOnly />
       </div>
       <div className='flex-1 m-auto flex flex-col'>
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={5} size={10} readOnly /></span>
-          <ProgressBar percent={boardData.scores[4]/boardData.total_count*100} width={150} height={10} color={'#fab005'} />
+          <ProgressBar percent={boardData.scores[4]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={4} size={10} readOnly /></span>
-          <ProgressBar percent={boardData.scores[3]/boardData.total_count*100} width={150} height={10} color={'#fab005'} />
+          <ProgressBar percent={boardData.scores[3]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={3} size={10} readOnly /></span>
-          <ProgressBar percent={boardData.scores[2]/boardData.total_count*100} width={150} height={10} color={'#fab005'} />
+          <ProgressBar percent={boardData.scores[2]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={2} size={10} readOnly /></span>
-          <ProgressBar percent={boardData.scores[1]/boardData.total_count*100} width={150} height={10} color={'#fab005'} />
+          <ProgressBar percent={boardData.scores[1]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={1} size={10} readOnly /></span>
-          <ProgressBar percent={boardData.scores[0]/boardData.total_count*100} width={150} height={10} color={'#fab005'} />
+          <ProgressBar percent={boardData.scores[0]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
           
         
@@ -304,7 +304,7 @@ function RatingPage() {
       onChange={(value) => {
         fetchRatings(boardData.board_id, value)
         setPage(value)}} 
-      total={boardData.total_count/perPage}/>
+      total={boardData.score_count/perPage}/>
     </div>
   </div>
     : 

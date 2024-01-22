@@ -45,9 +45,16 @@ export default function BoardPage() {
     const data = await userApi.userInfo();
     console.log(data);
     if (data.code === 'SUCCESS') {
-      setUserId(data.data.user_id);
+      if(!data.data.user_id)
+      {
+        setUserId(-1);
+        // fetchBoardlists(1, entriesPerPage, -1);
+              
+      }else{
+        setUserId(data.data.user_id);
+        // fetchBoardlists(1, entriesPerPage, data.data.user_id);
+      }
       setRole(data.data.role);
-      fetchBoardlists(1, entriesPerPage, data.data.user_id);
       console.log(data.data.user_id);
     } else if (data.code === 'INVALID') {
       console.error(data.code);
@@ -66,6 +73,7 @@ export default function BoardPage() {
     if (data.code === 'SUCCESS') {
       setBoards(data.data.list);
       setPages(Math.ceil(data.data.total_cnt / per_page));
+      setCurrentPage(page); 
     } else if (data.code === 'INVALID') {
       console.error(data.code);
       notifications.show({
@@ -88,7 +96,8 @@ export default function BoardPage() {
     const data = await userApi.createBoard(title, description);
 
     if (data.code === 'SUCCESS') {
-      fetchBoardlists();
+      if(currentBoards === 'my') fetchBoardlists(currentPage, entriesPerPage, userId);
+      else fetchBoardlists(currentPage, entriesPerPage, -1);
       notifications.show({
         title: 'Board',
         color: 'cyan',
@@ -115,7 +124,13 @@ export default function BoardPage() {
     const data = await userApi.modifyBoard(boardId, title, description);
 
     if (data.code === 'SUCCESS') {
-      fetchBoardlists();
+      if(currentBoards === 'my') fetchBoardlists(currentPage, entriesPerPage, userId);
+      else fetchBoardlists(currentPage, entriesPerPage, -1);
+      notifications.show({
+        title: 'Board',
+        color: 'cyan',
+        message: 'Board modified.',
+      });
     } else if (data.code === 'INVALID') {
       notifications.show({
         title: 'Board',
@@ -146,7 +161,8 @@ export default function BoardPage() {
         color: 'cyan',
         message: 'Board deleted.',
       });
-      fetchBoardlists();
+      if(currentBoards === 'my') fetchBoardlists(currentPage, entriesPerPage, userId);
+      else fetchBoardlists(currentPage, entriesPerPage, -1);
     } else if (data.code === 'INVALID') {
       console.error(data.code);
       notifications.show({
@@ -173,8 +189,13 @@ export default function BoardPage() {
         message: 'Please register/login first.',
       });
     } else if (role === 'USER' || role === 'ADMIN') {
-      fetchBoardlists(currentPage, entriesPerPage, userId); 
+      setCurrentPage(1);
+      fetchBoardlists(1, entriesPerPage, userId);
       setCurrentBoards('my'); 
+      console.log("userId",userId);
+      console.log("my boarddata",userId,boards);
+      // setPages(Math.ceil(data.data.total_cnt / per_page));
+      
     } 
   };
 
@@ -280,12 +301,13 @@ export default function BoardPage() {
       </Modal>
       </div>
 
-
+{/* 增加样式 */}
       {/* 翻页 */}
       <Pagination.Root total={pages} onChange={(page) => {
         setCurrentPage(page);
-        fetchBoardlists(currentPage, entriesPerPage, userId);
-      }}> 
+        if(currentBoards === 'my') fetchBoardlists(page, entriesPerPage, userId);
+        else fetchBoardlists(page, entriesPerPage, -1);
+      }}>
         <Group gap={5} justify="center">
           <Pagination.First />
           <Pagination.Previous />
