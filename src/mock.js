@@ -145,3 +145,37 @@ Mock.mock(/\/api\/rating\/get-page/, 'get', (options) => {
 Mock.mock(/\/api\/rating\/create/, 'post', {
   code: 'SUCCESS'
 });
+
+// get user rating
+Mock.mock(/\/api\/rating\/get-user/, 'get', (options) => {
+  const params = new URLSearchParams(options.url.split('?')[1]);
+  const board_id = params.get('board_id');
+  const user_id = params.get('user_id');
+  return Mock.mock({
+    code: 'SUCCESS',
+    data: {
+      rating_id: '@increment',
+      description: '@sentence',
+      score: '@integer(1, 5)',
+      time: '@datetime',
+      creator: {
+        user_id: user_id,
+        user_name: '@name'
+      }
+    }
+  })
+  // rating不存在
+  return {
+    code: 'NOT_EXIST',
+  };
+});
+
+// modify rating
+Mock.mock(/\/api\/rating\/modify/, 'post', {
+  code: 'SUCCESS'
+});
+
+// delete rating
+Mock.mock(/\/api\/rating\/delete/, 'post', {
+  code: 'SUCCESS'
+});
