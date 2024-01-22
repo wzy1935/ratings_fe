@@ -26,7 +26,7 @@ export default function BoardPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [userId, setUserId] = useState(-1);
-  const [role, setRole] = useState('USER');
+  const [role, setRole] = useState('ADMIN');
 
   const entriesPerPage = 12;
   const [pages, setPages] = useState(0);
@@ -42,7 +42,7 @@ export default function BoardPage() {
 
   // 没有登陆的用户有没有userId
   const fetchUserId = async () => {
-    const data = await userApi.getUserInfo();
+    const data = await userApi.userInfo();
     console.log(data);
     if (data.code === 'SUCCESS') {
       setUserId(data.data.user_id);

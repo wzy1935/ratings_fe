@@ -1,6 +1,6 @@
 import { Card, Image, Text, Badge, Title, Button, Group, Rating, Stack, Modal, Textarea } from '@mantine/core';
 
-function RatingCard({ ratingData }) {
+function RatingCard({ ratingData, isAdmin, onDelete }) {
 
   return (
     <Card  padding="lg" radius="md" withBorder className='my-2'>
@@ -14,9 +14,12 @@ function RatingCard({ ratingData }) {
           <Text size="sm" >
             {ratingData.description}
           </Text>
-          <Text size="sm" c="dimmed">
-            {ratingData.time}
-          </Text>
+          <Group>
+            <Text size="sm" c="dimmed">
+              {ratingData.time}
+            </Text>
+            {isAdmin && <Button onClick={onDelete} color="red" variant="light" size="compact-xs">Delete</Button>}
+          </Group>
         </Stack>
         
       </Group>

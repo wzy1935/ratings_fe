@@ -2,17 +2,18 @@ import Mock from 'mockjs';
 
 
 // Mock the GET request to '/api/user/user-info'
-Mock.mock(/\/api\/user\/user-info/, 'get', {  // You can add logic here to return different responses based on the options, if needed
+Mock.mock(/\/api\/user\/user-info/, 'get', () => {
+  // You can add logic here to return different responses based on the options, if needed
 
   // Returning a success response
-  return: {
-      code: 'SUCCESS',
-      data: {
-          role: 'ADMIN', // or 'USER', 'BASE' based on your requirements
-          user_name: 'John Doe',
-          user_id: 1
-      }
-  },
+  return {
+    code: 'SUCCESS',
+    data: {
+        role: 'ADMIN', // or 'USER', 'BASE' based on your requirements
+        user_name: 'John Doe',
+        user_id: 1
+    }
+  };
 });
 
 // /api/board/get-page

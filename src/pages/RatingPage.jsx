@@ -71,12 +71,12 @@ function RatingPage() {
   };
 
   const fetchUserInfo = async () => { 
-    const userInfo = await userApi.getUserInfo() 
-    // console.log(userInfo.data)
+    const userInfo = await userApi.userInfo() 
+    console.log("userinfo",userInfo.data)
     setUserData(userInfo.data);
     return userInfo.data;
   };
-
+  
 
   const fetchUserRating = async (board_id = board_id, user_id=userData.user_id) => {
     const userRating = await userApi.getUserRating(board_id, user_id);

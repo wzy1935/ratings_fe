@@ -22,7 +22,7 @@ export default {
     });
   },
 
-  async getUserInfo() {
+  async userInfo() {
     return await http.get('/api/user/user-info');
   },
 
@@ -74,6 +74,7 @@ export default {
       comment
     });
   },
+  
   async getUserRating(board_id, user_id) {
     return await http.get('/api/rating/get-user-rating', {
       params: { board_id }
