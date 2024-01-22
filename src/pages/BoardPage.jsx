@@ -172,7 +172,7 @@ export default function BoardPage() {
         color: 'red',
         message: 'Please register/login first.',
       });
-    } else if (role === 'USER') {
+    } else if (role === 'USER' || role === 'ADMIN') {
       fetchBoardlists(currentPage, entriesPerPage, userId); 
       setCurrentBoards('my'); 
     } 
