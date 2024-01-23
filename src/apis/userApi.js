@@ -67,19 +67,20 @@ export default {
     });
   },
 
-  async createRating(board_id, score, comment) {
-    return await http.post('/api/rating/create', {
-      board_id,
+  async getUserRating(user_id, board_id) {
+    return await http.get('/api/rating/get-user', {
+      params: { user_id, board_id }
+    });
+  },
+
+  async createRating(score, description, board_id) {
+    return await http.post('/api/rating/create', { 
       score,
-      comment
+      description,
+      board_id,
     });
   },
   
-  async getUserRating(board_id, user_id) {
-    return await http.get('/api/rating/get-user-rating', {
-      params: { board_id }
-    });
-  },
 
   async modifyRating(rating_id, score, description) {
     return await http.post('/api/rating/modify', {

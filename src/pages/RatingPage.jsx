@@ -27,6 +27,7 @@ function RatingPage() {
   const [boardData, setBoardData] = useState(null);
   const [userData, setUserData] = useState(null);
   const [userRating, setUserRating] = useState(null);
+  const [userId, setUserId] = useState(null);
 
 
   
@@ -66,45 +67,62 @@ function RatingPage() {
 
   const fetchRatings = async (board_id = boardData.board_id, page = 1, per_page = 10  ) => {
     const ratings = await userApi.getRatings( board_id, page, per_page);
-      // console.log(ratings);
-      setRatings(ratings.data.list);
+      if (ratings.code === 'SUCCESS') {
+        setRatings(ratings.data.list);
+      } else if (ratings.code === 'INVALID') {
+        console.error(ratings.code);
+        notifications.show({
+          title: 'Rating',
+          color: 'red',
+          message: 'Invalid operation or other error. Please try again.',
+        });
+      } else if (ratings.code === 'NOT_EXIST') {
+        console.error(ratings.code);
+        notifications.show({
+          title: 'Rating',
+          color: 'red',
+          message: 'Rating does not exist.',
+        });
+      }
   };
 
   const fetchUserInfo = async () => { 
     const userInfo = await userApi.userInfo() 
-    console.log("userinfo",userInfo.data)
     setUserData(userInfo.data);
+    setUserId(userInfo.data.user_id);
     return userInfo.data;
   };
   
 
-  const fetchUserRating = async (board_id = board_id, user_id=userData.user_id) => {
+  const fetchUserRating = async (user_id=userData.user_id,board_id) => {
     const userRating = await userApi.getUserRating(board_id, user_id);
     console.log(userRating)
     if (userRating.code === 'SUCCESS') {
       setUserRating(userRating.data);
       setModalScore(userRating.data.score);
       setModalDescription(userRating.data.description);
+    } else if (userRating.code === 'INVALID') {
+      console.error(userRating.code);
+      notifications.show({
+        title: 'User Rating',
+        color: 'red',
+        message: 'Invalid operation or other error. Please try again.',
+      });
     }
+    // else if (userRating.code === 'NOT_EXIST') {
+    //   console.error(userRating.code);
+    //   notifications.show({
+    //     title: 'User Rating',
+    //     color: 'red',
+    //     message: 'Rating does not exist.',
+    //   });
+    // }
   }
-
-// test data
-  // const boardData = {
-  //   board_id: 123,
-  //   title: 'Board Title',
-  //   description: 'Board Description blablablalbalbalblablablalba Pkmpyzsswx qmrmobvsl sqpetsey rxnluilrr oqupvwjrrs mtywuwno lituuivc asbggxecq urhywnykne uvhg djxpih ujxq ipv jotvjic rhffn ponfqoxlh gfzy ndmu.',
-  //   overall_score: 4.5,
-  //   total_count: 1580,
-  //   scores: [30, 50, 100, 400, 1000],
-  //   creator: {
-  //     user_name: 'User Name',
-  //   },
-  // };
 
 
   async function createRating(score, description) {
     console.log(score, description);
-    const data = await userApi.createRating(board_id, score, description);
+    const data = await userApi.createRating(score, description,board_id);
 
     if (data.code === 'SUCCESS') {
       notifications.show({
@@ -112,6 +130,9 @@ function RatingPage() {
         color: 'cyan',
         message: 'Rating created successfully.',
       });
+      fetchRatings();
+      fetchUserRating(board_id, userData.user_id)
+      fetchBoard(board_id);
     } else {
       console.error(data.code);
       notifications.show({
@@ -120,14 +141,12 @@ function RatingPage() {
         message: 'Failed to create rating.',
       });
     }
-    fetchRatings()
-    fetchUserRating()
     setAddingRating(false);
   }
 
-  async function modifyUserRating(board_id, score, description) {
+  async function modifyUserRating(ratingId, score, description) {
     console.log(score, description);
-    const data = await userApi.modifyRating(board_id, score, description);
+    const data = await userApi.modifyRating(ratingId, score, description);
 
     if (data.code === 'SUCCESS') {
       notifications.show({
@@ -135,16 +154,22 @@ function RatingPage() {
         color: 'cyan',
         message: 'Rating modified successfully.',
       });
-    } else {
+      fetchUserRating(board_id, userData.user_id)
+      fetchBoard(board_id);
+    } else if (data.code === 'INVALID') {
       console.error(data.code);
       notifications.show({
         title: 'Rating',
         color: 'red',
-        message: 'Failed to modify rating.',
+        message: 'Invalid operation or other error. Please try again.',
       });
-    }
-    fetchUserRating()
-    setAddingRating(false);
+    } else if (data.code === 'NOT_EXIST') {
+      notifications.show({
+        title: 'Rating',
+        color: 'red',
+        message: 'Rating does not exist.',
+      });}
+    setAddingRating(false);   
   }
 
   async function deleteRating(rating_id) {
@@ -155,6 +180,9 @@ function RatingPage() {
         color: 'cyan',
         message: 'Rating deleted successfully.',
       });
+      fetchUserRating(board_id, userData.user_id)
+      fetchRatings();
+      fetchBoard(board_id);
     } else {
       console.error(data.code);
       notifications.show({
@@ -163,7 +191,7 @@ function RatingPage() {
         message: 'Failed to delete rating.',
       });
     }
-    fetchRatings()
+
   }
 
 
@@ -172,38 +200,44 @@ function RatingPage() {
   { boardData ? 
   <div className='xl:mx-64 md:mx-32 sm:mx-16'>
     <div className='flex py-4' id='board-info'>
+
       <div className='flex-[3]'>
         <Title order={1} className='block'>{boardData.title}</Title>
         <Text>{boardData.description}</Text>
       </div>
+
       <div className='w-[120px] m-auto p-2'>
         <Title>{boardData.overall_score}</Title>
         <Text>{boardData.score_cnt + ' ratings'}</Text>
         <Rating value={boardData.overall_score} fractions={2} readOnly />
       </div>
+
       <div className='flex-1 m-auto flex flex-col'>
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={5} size={10} readOnly /></span>
           <ProgressBar percent={boardData.scores[4]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
+
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={4} size={10} readOnly /></span>
           <ProgressBar percent={boardData.scores[3]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
+
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={3} size={10} readOnly /></span>
           <ProgressBar percent={boardData.scores[2]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
+
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={2} size={10} readOnly /></span>
           <ProgressBar percent={boardData.scores[1]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
         </div>
+
         <div className='flex my-1'>
           <span className='mr-2'><Rating value={1} size={10} readOnly /></span>
           <ProgressBar percent={boardData.scores[0]/boardData.score_cnt*100} width={150} height={10} color={'#fab005'} />
-        </div>
-          
-        
+        </div>       
+
       </div>
     </div>
 
@@ -218,8 +252,9 @@ function RatingPage() {
       }
       { userRating && 
         <>
-          <Text c="dimmed">{userRating.time}</Text>
-          <Button onClick={() => setAddingRating(true)} variant="light" size="compact-xs">Modify</Button> 
+          {/* <Text c="dimmed">{userRating.time}</Text> */}
+          <Button onClick={() => setAddingRating(true)} variant="light" size="compact-xs">Modify</Button>
+          <Button onClick={() => deleteRating(userRating.rating_id)} variant="light" size="compact-xs" color="red">Delete</Button>  
         </>
       }
     </Group>
@@ -267,7 +302,7 @@ function RatingPage() {
       <form className="space-y-4"
       onSubmit={(e) => {
         e.preventDefault();
-        userRating ? modifyUserRating(board_id, ModalScore, ModalDescription) : createRating(ModalScore, ModalDescription);
+        userRating ? modifyUserRating(userRating.rating_id, ModalScore, ModalDescription) : createRating(ModalScore, ModalDescription);
       }}>
         <Group justify="center">
           <Rating size={30}
