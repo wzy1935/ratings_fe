@@ -207,7 +207,7 @@ export default function BoardPage() {
 
 
   return (
-    <div className="flex flex-col w-full items-center p-4">
+    <div className="flex flex-col flex-grow w-full items-center p-4">
       {/* board list */}
       <div className="absolute top-12 left-4 mt-4 ml-4">
         <div className="flex">
@@ -304,26 +304,28 @@ export default function BoardPage() {
         </form>
       </Modal>
       </div>
-
-{/* 增加样式 */}
       {/* 翻页 */}
-      <Pagination.Root 
-        total={pages} 
-        value={currentPage} // 确保这里正确地设置了currentPage
-        onChange={(page) => {
-          setCurrentPage(page);
-          if(currentBoards === 'my') fetchBoardlists(page, entriesPerPage, userId);
-          else fetchBoardlists(page, entriesPerPage, -1);
-        }}>
-        <Group gap={5} justify="center">
-          <Pagination.First />
-          <Pagination.Previous />
-          <Pagination.Items />
-          <Pagination.Next />
-          <Pagination.Last />
-        </Group>
-      </Pagination.Root>
+      <div className="w-full mt-auto pb-4">
+        <Pagination.Root 
+          total={pages} 
+          value={currentPage} // 确保这里正确地设置了currentPage
+          onChange={(page) => {
+            setCurrentPage(page);
+            if(currentBoards === 'my') fetchBoardlists(page, entriesPerPage, userId);
+            else fetchBoardlists(page, entriesPerPage, -1);
+          }}>
+          <Group gap={5} justify="center">
+            <Pagination.First />
+            <Pagination.Previous />
+            <Pagination.Items />
+            <Pagination.Next />
+            <Pagination.Last />
+          </Group>
+        </Pagination.Root>
+      </div>
     </div>
+
+    
   );
 }
 

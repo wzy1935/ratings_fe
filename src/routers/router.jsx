@@ -5,11 +5,16 @@ import AuthPage from '../pages/AuthPage.jsx';
 import UserPage from '../pages/UserPage.jsx';
 import BoardPage from '../pages/BoardPage.jsx';
 import RatingPage from '../pages/RatingPage.jsx';
+import Content from '../pages/Content.jsx';
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
+      {
+        index: true, 
+        element: <Content />,
+      },
       {
         path: '/auth',
         element: <AuthPage />,
