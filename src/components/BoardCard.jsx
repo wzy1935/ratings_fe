@@ -39,6 +39,7 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
           <Rating value={boardData.overall_score} fractions={2} readOnly />
           <Badge size="md" color="blue.4">
             {boardData.overall_score}
+            {/* {boardData.overall_score === 0 ? '0' : boardData.overall_score.toFixed(1)} */}
           </Badge>
         </Group>
     

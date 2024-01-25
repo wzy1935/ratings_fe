@@ -198,18 +198,22 @@ export default function BoardPage() {
       
     } 
   };
-
+  const handleAllBoardsClick = () => {
+      setCurrentPage(1);
+      fetchBoardlists(1, entriesPerPage, -1);
+      setCurrentBoards('all');       // setPages(Math.ceil(data.data.total_cnt / per_page));
+    
+  };
 
 
   return (
     <div className="flex flex-col w-full items-center p-4">
-
       {/* board list */}
       <div className="absolute top-12 left-4 mt-4 ml-4">
         <div className="flex">
           {/* all boards */}
           <button
-            onClick={() => { fetchBoardlists(currentPage, entriesPerPage,-1); setCurrentBoards('all'); }}
+            onClick={handleAllBoardsClick}
             className={`px-4 py-2 text-sm font-bold ${currentBoards === 'all' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black hover:bg-gray-300'} rounded-l-full`}
           >
             All Boards
@@ -303,11 +307,14 @@ export default function BoardPage() {
 
 {/* 增加样式 */}
       {/* 翻页 */}
-      <Pagination.Root total={pages} onChange={(page) => {
-        setCurrentPage(page);
-        if(currentBoards === 'my') fetchBoardlists(page, entriesPerPage, userId);
-        else fetchBoardlists(page, entriesPerPage, -1);
-      }}>
+      <Pagination.Root 
+        total={pages} 
+        value={currentPage} // 确保这里正确地设置了currentPage
+        onChange={(page) => {
+          setCurrentPage(page);
+          if(currentBoards === 'my') fetchBoardlists(page, entriesPerPage, userId);
+          else fetchBoardlists(page, entriesPerPage, -1);
+        }}>
         <Group gap={5} justify="center">
           <Pagination.First />
           <Pagination.Previous />

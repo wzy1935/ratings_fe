@@ -181,7 +181,7 @@ function RatingPage() {
         message: 'Rating deleted successfully.',
       });
       fetchUserRating(board_id, userData.user_id)
-      fetchRatings();
+      setUserRating(null); 
       fetchBoard(board_id);
     } else {
       console.error(data.code);
@@ -208,7 +208,7 @@ function RatingPage() {
 
       <div className='w-[120px] m-auto p-2'>
         <Title>{boardData.overall_score}</Title>
-        <Text>{boardData.score_cnt + ' ratings'}</Text>
+        <Text fw={600} c="gray">{boardData.score_cnt + ' Ratings'}</Text>
         <Rating value={boardData.overall_score} fractions={2} readOnly />
       </div>
 
@@ -258,12 +258,15 @@ function RatingPage() {
         </>
       }
     </Group>
-    { userRating && 
+    { userRating && userRating.description &&
       <Group wrap='text-wrap'>
         <div>
           <Badge size="md">My review: </Badge>
         </div>
-        <Text className=''>{userRating.description}</Text>
+        {/* <Text className=''>{userRating.description}</Text> */}
+          <Text className='' style={{ fontFamily: 'Arial, sans-serif', color: '#333', fontSize: '1rem', lineHeight: '1.5' }}>
+            {userRating.description}
+          </Text>
       </Group>
     }
     
