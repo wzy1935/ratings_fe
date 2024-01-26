@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 
 export default function HeadBar() {
   return (
-    <div className=" bg-slate-800 text-white p-2 flex space-x-3">
-      <div className=" font-bold">Ratings</div>
+    <div className=" bg-gray-700 text-white p-2 flex space-x-3">
+      <button>
+        <Link to={'/'} className="font-bold">Ratings</Link>
+      </button>
       <button>
         <Link to={'/board'}>Boards</Link>
       </button>

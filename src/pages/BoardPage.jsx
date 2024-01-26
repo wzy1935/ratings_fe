@@ -13,7 +13,8 @@ import {
   Modal,
   Textarea,
   Grid,
-  Pagination
+  Pagination,
+  Transition
 } from '@mantine/core';
 
 export default function BoardPage() {
@@ -26,7 +27,7 @@ export default function BoardPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [userId, setUserId] = useState(-1);
-  const [role, setRole] = useState('ADMIN');
+  const [role, setRole] = useState('BASE');
 
   const entriesPerPage = 12;
   const [pages, setPages] = useState(0);
@@ -45,7 +46,15 @@ export default function BoardPage() {
     const data = await userApi.userInfo();
     console.log(data);
     if (data.code === 'SUCCESS') {
-      setUserId(data.data.user_id);
+      if(!data.data.user_id)
+      {
+        setUserId(-1);
+        // fetchBoardlists(1, entriesPerPage, -1);
+              
+      }else{
+        setUserId(data.data.user_id);
+        // fetchBoardlists(1, entriesPerPage, data.data.user_id);
+      }
       setRole(data.data.role);
       console.log(data.data.user_id);
     } else if (data.code === 'INVALID') {
@@ -65,6 +74,7 @@ export default function BoardPage() {
     if (data.code === 'SUCCESS') {
       setBoards(data.data.list);
       setPages(Math.ceil(data.data.total_cnt / per_page));
+      setCurrentPage(page); 
     } else if (data.code === 'INVALID') {
       console.error(data.code);
       notifications.show({
@@ -87,7 +97,8 @@ export default function BoardPage() {
     const data = await userApi.createBoard(title, description);
 
     if (data.code === 'SUCCESS') {
-      fetchBoardlists();
+      if(currentBoards === 'my') fetchBoardlists(currentPage, entriesPerPage, userId);
+      else fetchBoardlists(currentPage, entriesPerPage, -1);
       notifications.show({
         title: 'Board',
         color: 'cyan',
@@ -114,7 +125,13 @@ export default function BoardPage() {
     const data = await userApi.modifyBoard(boardId, title, description);
 
     if (data.code === 'SUCCESS') {
-      fetchBoardlists();
+      if(currentBoards === 'my') fetchBoardlists(currentPage, entriesPerPage, userId);
+      else fetchBoardlists(currentPage, entriesPerPage, -1);
+      notifications.show({
+        title: 'Board',
+        color: 'cyan',
+        message: 'Board modified.',
+      });
     } else if (data.code === 'INVALID') {
       notifications.show({
         title: 'Board',
@@ -145,7 +162,8 @@ export default function BoardPage() {
         color: 'cyan',
         message: 'Board deleted.',
       });
-      fetchBoardlists();
+      if(currentBoards === 'my') fetchBoardlists(currentPage, entriesPerPage, userId);
+      else fetchBoardlists(currentPage, entriesPerPage, -1);
     } else if (data.code === 'INVALID') {
       console.error(data.code);
       notifications.show({
@@ -172,22 +190,31 @@ export default function BoardPage() {
         message: 'Please register/login first.',
       });
     } else if (role === 'USER' || role === 'ADMIN') {
-      fetchBoardlists(currentPage, entriesPerPage, userId); 
+      setCurrentPage(1);
+      fetchBoardlists(1, entriesPerPage, userId);
       setCurrentBoards('my'); 
+      console.log("userId",userId);
+      console.log("my boarddata",userId,boards);
+      // setPages(Math.ceil(data.data.total_cnt / per_page));
+      
     } 
+  };
+  const handleAllBoardsClick = () => {
+      setCurrentPage(1);
+      fetchBoardlists(1, entriesPerPage, -1);
+      setCurrentBoards('all');       // setPages(Math.ceil(data.data.total_cnt / per_page));
+    
   };
 
 
-
   return (
-    <div className="flex flex-col w-full items-center p-4">
-
+    <div className="flex flex-col flex-grow w-full items-center p-4">
       {/* board list */}
       <div className="absolute top-12 left-4 mt-4 ml-4">
         <div className="flex">
           {/* all boards */}
           <button
-            onClick={() => { fetchBoardlists(currentPage, entriesPerPage,-1); setCurrentBoards('all'); }}
+            onClick={handleAllBoardsClick}
             className={`px-4 py-2 text-sm font-bold ${currentBoards === 'all' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black hover:bg-gray-300'} rounded-l-full`}
           >
             All Boards
@@ -234,62 +261,75 @@ export default function BoardPage() {
       </button>
       )}
       <div className="flex flex-row flex-wrap justify-center">
-      <Modal 
-        className="p-4"
-        opened={addingBoard}
-        onClose={() => setAddingBoard(false)}
-        title={<Title order={3} className="text-center w-full">Add New Board</Title>}
-      >
-        <form className="space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          createBoard(newBoardTitle, newBoardDescription);
-        }}>
-        
-          <Textarea className="w-full p-2"
-            label="Board Title"
-            placeholder="Enter board title"
-            variant="filled"
-            value={newBoardTitle}
-            onChange={(e) => setNewBoardTitle(e.target.value)}
-            autosize
-            minRows={1}
-            maxRows={4}
-          />
-          <Textarea className="w-full p-2"
-            label="Board Description"
-            placeholder="Enter board description"
-            variant="filled"
-            value={newBoardDescription}
-            onChange={(e) => setNewBoardDescription(e.target.value)}
-            autosize
-            minRows={3}
-            maxRows={6}
-          />
-          <div className="flex justify-center">
-            <Button 
-              variant="filled" color="cyan"
-              className="text-white font-bold py-2 px-4 rounded hover:bg-gray-400" type="submit"
-            >
-              SUBMIT
-            </Button>
-          </div>
-        </form>
-      </Modal>
+
+        <Modal 
+          // className="p-4"
+          opened={addingBoard}
+          onClose={() => setAddingBoard(false)}
+          title={<Title order={4}>Add New Board</Title>}
+        >
+          {/* <Text color ="dark" size="xl" >Add New Board</Text> */}
+          <form className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            createBoard(newBoardTitle, newBoardDescription);
+            setAddingBoard(false);
+          }}>
+          
+            <Textarea className="w-full p-2"
+              label="Board Title"
+              placeholder="Enter board title"
+              variant="filled"
+              value={newBoardTitle}
+              onChange={(e) => setNewBoardTitle(e.target.value)}
+              autosize
+              minRows={1}
+              maxRows={4}
+            />
+            <Textarea className="w-full p-2"
+              label="Board Description"
+              placeholder="Enter board description"
+              variant="filled"
+              value={newBoardDescription}
+              onChange={(e) => setNewBoardDescription(e.target.value)}
+              autosize
+              minRows={3}
+              maxRows={6}
+            />
+            <div className="flex justify-center">
+              <Button 
+                variant="filled" color="cyan"
+                className="text-white font-bold py-2 px-4 rounded hover:bg-gray-400" type="submit"
+              >
+                SUBMIT
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      
       </div>
-
-
       {/* 翻页 */}
-      <Pagination.Root total={pages} onChange={(page) => fetchBoardlists(currentPage, entriesPerPage,userId)}>
-        <Group gap={5} justify="center">
-          <Pagination.First />
-          <Pagination.Previous />
-          <Pagination.Items />
-          <Pagination.Next />
-          <Pagination.Last />
-        </Group>
-      </Pagination.Root>
+      <div className="w-full mt-auto pb-4">
+        <Pagination.Root 
+          total={pages} 
+          value={currentPage} // 确保这里正确地设置了currentPage
+          onChange={(page) => {
+            setCurrentPage(page);
+            if(currentBoards === 'my') fetchBoardlists(page, entriesPerPage, userId);
+            else fetchBoardlists(page, entriesPerPage, -1);
+          }}>
+          <Group gap={5} justify="center">
+            <Pagination.First />
+            <Pagination.Previous />
+            <Pagination.Items />
+            <Pagination.Next />
+            <Pagination.Last />
+          </Group>
+        </Pagination.Root>
+      </div>
     </div>
+
+    
   );
 }
 

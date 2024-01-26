@@ -8,8 +8,8 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
     //   return <div>Loading...</div>;
     // }
     const [modifyBoard, setModifyBoard] = useState(false);
-    const [newTitle, setNewTitle] = useState(boardData.title);
-    const [newDescription, setNewDescription] = useState(boardData.description);
+    const [newTitle, setNewTitle] = useState("");
+    const [newDescription, setNewDescription] = useState("");
 
     // 修改Modal打开的处理函数
     const handleModifyClick = () => {
@@ -21,6 +21,8 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
         e.preventDefault();
         onModify(boardData.board_id, newTitle, newDescription); // 调用onModify并传递新的title和description
         setModifyBoard(false); // 在修改完成后关闭Modal
+        setNewTitle(""); // 重置title
+        setNewDescription(""); // 重置description
     };
 
     return (
@@ -39,6 +41,7 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
           <Rating value={boardData.overall_score} fractions={2} readOnly />
           <Badge size="md" color="blue.4">
             {boardData.overall_score}
+            {/* {boardData.overall_score === 0 ? '0' : boardData.overall_score.toFixed(1)} */}
           </Badge>
         </Group>
     
@@ -51,13 +54,29 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
         <div className="flex flex-row flex-wrap justify-center">
           <Modal className="p-4" opened={modifyBoard} onClose={() => setModifyBoard(false)} title="Modify Board">
             <form className="space-y-4" onSubmit={handleFormSubmit}>
-              <Textarea className="w-full p-2" label="Board Title" placeholder="Enter board title" variant="filled" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} autosize minRows={1} maxRows={4} />
-              <Textarea className="w-full p-2" label="Board Description" placeholder="Enter board description" variant="filled" value={newDescription} onChange={(e) => setNewDescription(e.target.value)} autosize minRows={3} maxRows={6} />
+              <Textarea className="w-full p-2" 
+                        label="Board Title" 
+                        placeholder={boardData.title}
+                        variant="filled" 
+                        // value={newTitle} 
+                        onChange={(e) => setNewTitle(e.target.value)} 
+                        autosize minRows={1} maxRows={4} 
+              />
+              <Textarea className="w-full p-2" 
+                        label="Board Description" 
+                        placeholder={boardData.description}
+                        variant="filled" 
+                        // value={newDescription} 
+                        onChange={(e) => setNewDescription(e.target.value)} 
+                        autosize minRows={3} maxRows={6} 
+              />
+
               <div className="flex justify-center">
                 <Button variant="filled" color="cyan" className="text-white font-bold py-2 px-4 rounded hover:bg-gray-400" type="submit">
                   UPDATE
                 </Button>
               </div>
+
             </form>
           </Modal>
         </div>
