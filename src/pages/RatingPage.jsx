@@ -275,7 +275,12 @@ function RatingPage() {
 
       {/* ratings */}
       {ratings.map((ratingData) => {
-          return <RatingCard key={ratingData.rating_id} ratingData={ratingData} isAdmin={ userData && userData.role === 'ADMIN' } onDelete={() => setConfirmModal(true)}/>
+          return <RatingCard 
+                    key={ratingData.rating_id} 
+                    ratingData={ratingData} 
+                    isAdmin={ userData && userData.role === 'ADMIN' } 
+                    onDelete={() => setConfirmModal(true)}
+                  />
       })}
 
       <Modal 
@@ -285,20 +290,20 @@ function RatingPage() {
         title={<Title order={3} className="text-center w-full">{ userRating ? 'Modify Rating' : 'Add New Rating'}</Title>}
       >
         <form className="space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          userRating ? modifyUserRating(userRating.rating_id, ModalScore, ModalDescription) : createRating(ModalScore, ModalDescription);
-        }}>
+              onSubmit={(e) => {
+                e.preventDefault();
+                userRating ? modifyUserRating(userRating.rating_id, ModalScore, ModalDescription) : createRating(ModalScore, ModalDescription);
+        }}> 
           <Group justify="center">
             <Rating size={30}
-              value={ModalScore}
-              onChange={setModalScore}
-            ></Rating>
+                    value={ModalScore}
+                    onChange={setModalScore}>                
+            </Rating>
             <Textarea className="w-full p-2"
               label="Rating Description"
               placeholder="Enter rating description"
               variant="filled"
-              value={ModalDescription}
+              // value={ModalDescription}
               onChange={(e) => setModalDescription(e.target.value)}
               autosize
               minRows={3}

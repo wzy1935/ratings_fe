@@ -13,7 +13,8 @@ import {
   Modal,
   Textarea,
   Grid,
-  Pagination
+  Pagination,
+  Transition
 } from '@mantine/core';
 
 export default function BoardPage() {
@@ -260,49 +261,52 @@ export default function BoardPage() {
       </button>
       )}
       <div className="flex flex-row flex-wrap justify-center">
-      <Modal 
-        className="p-4"
-        opened={addingBoard}
-        onClose={() => setAddingBoard(false)}
-        title={<Title order={3} className="text-center w-full">Add New Board</Title>}
-      >
-        <form className="space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          createBoard(newBoardTitle, newBoardDescription);
-          setAddingBoard(false);
-        }}>
-        
-          <Textarea className="w-full p-2"
-            label="Board Title"
-            placeholder="Enter board title"
-            variant="filled"
-            value={newBoardTitle}
-            onChange={(e) => setNewBoardTitle(e.target.value)}
-            autosize
-            minRows={1}
-            maxRows={4}
-          />
-          <Textarea className="w-full p-2"
-            label="Board Description"
-            placeholder="Enter board description"
-            variant="filled"
-            value={newBoardDescription}
-            onChange={(e) => setNewBoardDescription(e.target.value)}
-            autosize
-            minRows={3}
-            maxRows={6}
-          />
-          <div className="flex justify-center">
-            <Button 
-              variant="filled" color="cyan"
-              className="text-white font-bold py-2 px-4 rounded hover:bg-gray-400" type="submit"
-            >
-              SUBMIT
-            </Button>
-          </div>
-        </form>
-      </Modal>
+
+        <Modal 
+          // className="p-4"
+          opened={addingBoard}
+          onClose={() => setAddingBoard(false)}
+          title={<Title order={4}>Add New Board</Title>}
+        >
+          {/* <Text color ="dark" size="xl" >Add New Board</Text> */}
+          <form className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            createBoard(newBoardTitle, newBoardDescription);
+            setAddingBoard(false);
+          }}>
+          
+            <Textarea className="w-full p-2"
+              label="Board Title"
+              placeholder="Enter board title"
+              variant="filled"
+              value={newBoardTitle}
+              onChange={(e) => setNewBoardTitle(e.target.value)}
+              autosize
+              minRows={1}
+              maxRows={4}
+            />
+            <Textarea className="w-full p-2"
+              label="Board Description"
+              placeholder="Enter board description"
+              variant="filled"
+              value={newBoardDescription}
+              onChange={(e) => setNewBoardDescription(e.target.value)}
+              autosize
+              minRows={3}
+              maxRows={6}
+            />
+            <div className="flex justify-center">
+              <Button 
+                variant="filled" color="cyan"
+                className="text-white font-bold py-2 px-4 rounded hover:bg-gray-400" type="submit"
+              >
+                SUBMIT
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      
       </div>
       {/* 翻页 */}
       <div className="w-full mt-auto pb-4">
