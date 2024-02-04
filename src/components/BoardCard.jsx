@@ -8,8 +8,8 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
     //   return <div>Loading...</div>;
     // }
     const [modifyBoard, setModifyBoard] = useState(false);
-    const [newTitle, setNewTitle] = useState("");
-    const [newDescription, setNewDescription] = useState("");
+    const [newTitle, setNewTitle] = useState(boardData.title);
+    const [newDescription, setNewDescription] = useState(boardData.description);
 
     // 修改Modal打开的处理函数
     const handleModifyClick = () => {
@@ -45,20 +45,28 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
           </Badge>
         </Group>
     
-        {/* modify button */}
-        {onModify && (
-          <Button variant="filled" color="cyan" fullWidth mt="md" radius="md" onClick={handleModifyClick}>
-            Modify
-          </Button>
-        )}
+        {/* buttons */}
+        <div className=' flex space-x-2'>
+          {onModify && (
+            <Button variant="filled" color="cyan" mt="md" radius="md" onClick={handleModifyClick}>
+              Modify
+            </Button>
+          )}
+          {onDelete && (
+            <Button variant="filled" color="red" mt="md" radius="md" onClick={() => onDelete(boardData.board_id)}>
+              Delete
+            </Button>
+          )}
+        </div>
+
+
         <div className="flex flex-row flex-wrap justify-center">
-          <Modal className="p-4" opened={modifyBoard} onClose={() => setModifyBoard(false)} title="Modify Board">
+          <Modal opened={modifyBoard} onClose={() => setModifyBoard(false)} title="Modify Board">
             <form className="space-y-4" onSubmit={handleFormSubmit}>
               <Textarea className="w-full p-2" 
                         label="Board Title" 
-                        placeholder={boardData.title}
                         variant="filled" 
-                        // value={newTitle} 
+                        value={newTitle} 
                         onChange={(e) => setNewTitle(e.target.value)} 
                         autosize minRows={1} maxRows={4} 
               />
@@ -66,7 +74,7 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
                         label="Board Description" 
                         placeholder={boardData.description}
                         variant="filled" 
-                        // value={newDescription} 
+                        value={newDescription} 
                         onChange={(e) => setNewDescription(e.target.value)} 
                         autosize minRows={3} maxRows={6} 
               />
@@ -80,13 +88,7 @@ export default function BoardCard({ boardData, onDelete, onModify }) {
             </form>
           </Modal>
         </div>
-          
-        {/* delete button */}
-        {onDelete && (
-          <Button variant="filled" color="red" fullWidth mt="md" radius="md" onClick={() => onDelete(boardData.board_id)}>
-            Delete
-          </Button>
-        )}
+        
     
         <Badge color="rgba(227, 227, 227, 1)" size="sm" className="mt-2" fullWidth>Created by: {boardData.creator.user_name}</Badge>
       </Card>

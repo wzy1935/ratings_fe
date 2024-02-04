@@ -24,6 +24,7 @@ function RatingPage() {
   // 当前页
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [maxPage, setMaxPage] = useState(1);
   const [boardData, setBoardData] = useState(null);
   const [userData, setUserData] = useState(null);
   const [userRating, setUserRating] = useState(null);
@@ -33,7 +34,6 @@ function RatingPage() {
   
   const fetchBoard = async (boardId) => {
     const data = await userApi.getBoard(boardId);
-    console.log(data);
     if (data.code === 'SUCCESS') {
       setBoardData(data.data);
       fetchRatings(data.data.board_id, page, perPage);
@@ -68,6 +68,8 @@ function RatingPage() {
   const fetchRatings = async (board_id = boardData.board_id, page = 1, per_page = 10  ) => {
     const ratings = await userApi.getRatings( board_id, page, per_page);
       if (ratings.code === 'SUCCESS') {
+        setMaxPage(Math.ceil(ratings.data.total_cnt/perPage));
+        console.log(maxPage, ratings, perPage, Math.ceil(ratings.data.total_cnt/perPage));
         setRatings(ratings.data.list);
       } else if (ratings.code === 'INVALID') {
         console.error(ratings.code);
@@ -279,7 +281,7 @@ function RatingPage() {
                     key={ratingData.rating_id} 
                     ratingData={ratingData} 
                     isAdmin={ userData && userData.role === 'ADMIN' } 
-                    onDelete={() => setConfirmModal(true)}
+                    onDelete={() => deleteRating(userRating.rating_id)}
                   />
       })}
 
@@ -303,7 +305,7 @@ function RatingPage() {
               label="Rating Description"
               placeholder="Enter rating description"
               variant="filled"
-              // value={ModalDescription}
+              value={ModalDescription}
               onChange={(e) => setModalDescription(e.target.value)}
               autosize
               minRows={3}
@@ -321,19 +323,15 @@ function RatingPage() {
         </form>
       </Modal>
 
-      {/* 确认删除 */}
-      <ConfirmModal opened={confirmModal} setOpened={setConfirmModal} onConfirm={deleteRating}>
-        <Text size='lg'>Are you sure to delete this rating?</Text>
-      </ConfirmModal>
       {/* 翻页 */}
       <div className='m-auto w-full'> {/* mt-auto will push your pagination to the bottom */}
         <div className='flex justify-center my-4 xl:mx-64 md:mx-32 sm:mx-16'>
-          <Pagination value={page} 
+          <Pagination value={page}
             onChange={(value) => {
               fetchRatings(boardData.board_id, value);
               setPage(value);
             }} 
-            total={Math.ceil(boardData.score_count/perPage)} // Ensure you round up as total should be an integer
+            total={maxPage} // Ensure you round up as total should be an integer
           />
         </div>
       </div>
