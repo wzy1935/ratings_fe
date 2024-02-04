@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-ui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-ui
+  template:
+    metadata:
+      labels:
+        app: web-ui
+    spec:
+      containers:
+        - name: web-ui-container
+          image: mialiu755/ratings_fe:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: VITE_BACKEND_URL
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: web-ui-deployment
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: web-ui
+#   template:
+#     metadata:
+#       labels:
+#         app: web-ui
+#     spec:
+#       volumes:
+#         - name: config-volume
+#           emptyDir: {}
+#       initContainers:
+#         - name: init-config
+#           image: busybox
+#           command:
+#             - "/bin/sh"
+#             - "-c"
+#             - 'echo ''window.VITE_BACKEND_URL="$(VITE_BACKEND_URL)";'' > /usr/share/nginx/html/config.js'
+#     env:
+#       - name: VITE_BACKEND_URL
+#         valueFrom:
+#           configMapKeyRef:
+#             name: frontend-config
+#             key: VITE_BACKEND_URL
+#     volumeMounts:
+#       - name: config-volume
+#         mountPath: /usr/share/nginx/html
+# containers:
+#   - name: web-ui-container
+#     image: mialiu755/ratings_fe:latest
+#     volumeMounts:
+#       - name: config-volume
+#         mountPath: /usr/share/nginx/html
